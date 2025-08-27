@@ -4,18 +4,36 @@ services:
     image: wordpress:latest
     container_name: blog-tech-log
     environment:
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - ./wp_data:/var/www/html
     ports:
       - 8080:80
     depends_on:
       - mysql
+    networks:
+      - blog-tech-log
 
   mysql:
     image: mysql:latest
     container_name: blog-tech-log-db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME}
+      MYSQL_USER: ${WORDPRESS_DB_USER}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      TZ: Asia/Seoul
+    expose:
+      - 3306
+    volumes:
+      - ./data:/var/lib/mysql
+    networks:
+      - blog-tech-log
+      
+networks:
+  blog-tech-log:
+    external: true 
